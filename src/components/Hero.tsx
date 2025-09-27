@@ -1,12 +1,28 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award } from "lucide-react";
+import { ArrowRight, Award, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground">
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-20" />
       
       <div className="container mx-auto px-4 py-20 relative z-10">
+        {/* Admin Access Button */}
+        <div className="absolute top-4 right-4">
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="bg-white/10 border-white/20 hover:bg-white/20 text-white"
+            onClick={() => navigate('/admin')}
+          >
+            <Settings className="w-4 h-4 mr-2" />
+            Admin
+          </Button>
+        </div>
+        
         <div className="max-w-4xl mx-auto text-center">
           {/* UNWTO Award Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 animate-fade-in">
