@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, Send, MapPin, X, Minimize2, Maximize2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   id: string;
@@ -31,6 +32,20 @@ export const ChatAssistant = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll to bottom when new messages are added
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -118,27 +133,27 @@ export const ChatAssistant = () => {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className={`fixed ${isMobile ? 'bottom-4 right-4' : 'bottom-6 right-6'} z-50`}>
         <Button
           onClick={() => setIsOpen(true)}
-          size="lg"
+          size={isMobile ? "default" : "lg"}
           className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90"
         >
-          <MessageCircle className="w-6 h-6 mr-2" />
-          Chat AI
+          <MessageCircle className={`${isMobile ? 'w-5 h-5 mr-1' : 'w-6 h-6 mr-2'}`} />
+          {isMobile ? 'Chat' : 'Chat AI'}
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
-      <Card className={`w-96 shadow-2xl transition-all duration-300 ${isMinimized ? 'h-14' : 'h-96'}`}>
+    <div className={`fixed ${isMobile ? 'bottom-4 right-4 left-4' : 'bottom-6 right-6'} z-50`}>
+      <Card className={`${isMobile ? 'w-full' : 'w-96'} shadow-2xl transition-all duration-300 ${isMinimized ? 'h-14' : isMobile ? 'h-[70vh]' : 'h-96'}`}>
         <CardHeader className="pb-2 bg-primary text-primary-foreground rounded-t-lg">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
+            <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'} flex items-center gap-2`}>
               <MessageCircle className="w-5 h-5" />
-              Asisten Wisata AI
+              {isMobile ? 'Asisten AI' : 'Asisten Wisata AI'}
             </CardTitle>
             <div className="flex gap-1">
               <Button
@@ -162,26 +177,29 @@ export const ChatAssistant = () => {
         </CardHeader>
         
         {!isMinimized && (
-          <CardContent className="p-0 flex flex-col h-80">
+          <CardContent className="p-0 flex flex-col" style={{ height: isMobile ? 'calc(70vh - 3.5rem)' : '20rem' }}>
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            <div 
+              ref={messagesContainerRef}
+              className={`flex-1 overflow-y-auto ${isMobile ? 'p-3' : 'p-4'} space-y-3`}
+            >
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] p-3 rounded-lg ${
+                  <div className={`${isMobile ? 'max-w-[85%]' : 'max-w-[80%]'} p-3 rounded-lg ${
                     message.isUser 
                       ? 'bg-primary text-primary-foreground' 
                       : 'bg-muted'
                   }`}>
-                    <p className="text-sm">{message.text}</p>
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'}`}>{message.text}</p>
                     {message.recommendation && (
                       <div className="mt-2 p-2 bg-background/20 rounded border">
-                        <h4 className="font-semibold text-sm">{message.recommendation.name}</h4>
-                        <p className="text-xs opacity-90 mt-1">{message.recommendation.description}</p>
+                        <h4 className={`font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>{message.recommendation.name}</h4>
+                        <p className={`${isMobile ? 'text-xs' : 'text-xs'} opacity-90 mt-1`}>{message.recommendation.description}</p>
                         {message.recommendation.coordinates && (
                           <Button
                             size="sm"
                             variant="outline"
-                            className="mt-2 h-7"
+                            className={`mt-2 ${isMobile ? 'h-6 text-xs px-2' : 'h-7'}`}
                             onClick={() => openInMaps(message.recommendation!.coordinates!)}
                           >
                             <MapPin className="w-3 h-3 mr-1" />
@@ -205,17 +223,19 @@ export const ChatAssistant = () => {
                   </div>
                 </div>
               )}
+              <div ref={messagesEndRef} />
             </div>
             
             {/* Input */}
-            <div className="p-4 border-t">
+            <div className={`${isMobile ? 'p-3' : 'p-4'} border-t`}>
               <div className="flex gap-2">
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Tanya tentang wisata Wukirsari..."
+                  placeholder={isMobile ? "Tanya tentang wisata..." : "Tanya tentang wisata Wukirsari..."}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   disabled={isLoading}
+                  className={isMobile ? 'text-sm' : ''}
                 />
                 <Button
                   onClick={handleSendMessage}
