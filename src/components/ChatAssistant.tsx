@@ -35,7 +35,7 @@ export const ChatAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      text: "Halo! Saya asisten wisata WukirTech. Tanya saya tentang destinasi wisata, produk UMKM, atau informasi lain tentang Desa Wukirsari!",
+      text: "Halo! Saya asisten Perjalanan Cerdas Anda. Tanya saya tentang destinasi wisata, produk UMKM, atau informasi lain tentang Desa Wukirsari!",
       isUser: false,
       timestamp: new Date()
     }
@@ -377,7 +377,7 @@ export const ChatAssistant = () => {
           className="rounded-full shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90"
         >
           <MessageCircle className={`${isMobile ? 'w-5 h-5 mr-1' : 'w-6 h-6 mr-2'}`} />
-          {isMobile ? 'Chat' : 'Chat AI'}
+          {isMobile ? 'Chat' : 'Chat Asisten'}
         </Button>
       </div>
     );
@@ -392,7 +392,7 @@ export const ChatAssistant = () => {
           <div className="flex items-center justify-between">
             <CardTitle className={`${isMobile ? 'text-base' : 'text-lg'} flex items-center gap-2`}>
               <MessageCircle className="w-5 h-5" />
-              {isMobile ? 'Asisten AI' : 'Asisten Wisata AI'}
+              {isMobile ? 'Asisten AI' : 'Asisten Perjalanan Cerdas'}
             </CardTitle>
             <div className="flex gap-1">
               <Button
