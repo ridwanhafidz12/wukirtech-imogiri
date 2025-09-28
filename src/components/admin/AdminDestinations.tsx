@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Plus, Edit, Trash2, MapPin } from "lucide-react";
+import { Plus, Edit, Trash2, MapPin, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -19,8 +19,7 @@ interface Destination {
   id: string;
   name: string;
   description: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  maps_url: string | null;
   image_url: string | null;
 }
 
@@ -34,8 +33,7 @@ export const AdminDestinations = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    latitude: "",
-    longitude: "",
+    maps_url: "",
     image_url: ""
   });
 
@@ -69,8 +67,7 @@ export const AdminDestinations = () => {
       const destinationData = {
         name: formData.name,
         description: formData.description || null,
-        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
-        longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+        maps_url: formData.maps_url || null,
         image_url: formData.image_url || null
       };
 
@@ -102,8 +99,7 @@ export const AdminDestinations = () => {
       setFormData({
         name: "",
         description: "",
-        latitude: "",
-        longitude: "",
+        maps_url: "",
         image_url: ""
       });
       fetchDestinations();
@@ -122,8 +118,7 @@ export const AdminDestinations = () => {
     setFormData({
       name: destination.name,
       description: destination.description || "",
-      latitude: destination.latitude?.toString() || "",
-      longitude: destination.longitude?.toString() || "",
+      maps_url: destination.maps_url || "",
       image_url: destination.image_url || ""
     });
     setIsOpen(true);
@@ -160,8 +155,7 @@ export const AdminDestinations = () => {
     setFormData({
       name: "",
       description: "",
-      latitude: "",
-      longitude: "",
+      maps_url: "",
       image_url: ""
     });
     setIsOpen(true);
@@ -212,29 +206,14 @@ export const AdminDestinations = () => {
                     rows={3}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="latitude">Latitude</Label>
-                    <Input
-                      id="latitude"
-                      type="number"
-                      step="any"
-                      value={formData.latitude}
-                      onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                      placeholder="-7.9344"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="longitude">Longitude</Label>
-                    <Input
-                      id="longitude"
-                      type="number"
-                      step="any"
-                      value={formData.longitude}
-                      onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                      placeholder="110.4578"
-                    />
-                  </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="maps_url">Link Google Maps</Label>
+                  <Input
+                    id="maps_url"
+                    value={formData.maps_url}
+                    onChange={(e) => setFormData({...formData, maps_url: e.target.value})}
+                    placeholder="https://maps.google.com/..."
+                  />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="image_url">URL Gambar</Label>
@@ -266,10 +245,15 @@ export const AdminDestinations = () => {
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg">{destination.name}</h3>
                   <p className="text-muted-foreground mt-1">{destination.description}</p>
-                  {destination.latitude && destination.longitude && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Koordinat: {destination.latitude}, {destination.longitude}
-                    </p>
+                  {destination.maps_url && (
+                    <a
+                      href={destination.maps_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline flex items-center gap-1 mt-2 text-sm"
+                    >
+                      <ExternalLink className="w-4 h-4" /> Lihat di Google Maps
+                    </a>
                   )}
                 </div>
                 <div className="flex gap-2">

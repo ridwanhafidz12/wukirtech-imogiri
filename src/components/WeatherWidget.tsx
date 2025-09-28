@@ -15,23 +15,27 @@ export const WeatherWidget = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate weather API call with mock data
     const fetchWeather = async () => {
       try {
-        // In a real implementation, you would call OpenWeatherMap API here
-        // For now, we'll use mock data
-        setTimeout(() => {
-          setWeather({
-            temperature: 28,
-            condition: "sunny",
-            humidity: 65,
-            windSpeed: 12,
-            description: "Cerah berawan"
-          });
-          setLoading(false);
-        }, 1000);
+        const apiKey = "bcf1c39d83b539ab46e0638fb8e75840"; // 🔑 Ganti dengan API key OpenWeatherMap
+        const lat = -7.9025; // Desa Wukirsari
+        const lon = 110.3953;
+
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric&lang=id`
+        );
+        const data = await response.json();
+
+        setWeather({
+          temperature: Math.round(data.main.temp),
+          condition: data.weather[0].main.toLowerCase(),
+          humidity: data.main.humidity,
+          windSpeed: Math.round(data.wind.speed),
+          description: data.weather[0].description, // deskripsi bahasa Indonesia
+        });
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching weather data:', error);
+        console.error("Error fetching weather data:", error);
         setLoading(false);
       }
     };
@@ -40,16 +44,11 @@ export const WeatherWidget = () => {
   }, []);
 
   const getWeatherIcon = (condition: string) => {
-    switch (condition) {
-      case "sunny":
-        return <Sun className="w-8 h-8 text-yellow-500" />;
-      case "cloudy":
-        return <Cloud className="w-8 h-8 text-gray-500" />;
-      case "rainy":
-        return <CloudRain className="w-8 h-8 text-blue-500" />;
-      default:
-        return <Sun className="w-8 h-8 text-yellow-500" />;
-    }
+    if (condition.includes("cloud")) return <Cloud className="w-8 h-8 text-gray-500" />;
+    if (condition.includes("rain")) return <CloudRain className="w-8 h-8 text-blue-500" />;
+    if (condition.includes("sun") || condition.includes("clear"))
+      return <Sun className="w-8 h-8 text-yellow-500" />;
+    return <Sun className="w-8 h-8 text-yellow-500" />;
   };
 
   if (loading) {
@@ -96,11 +95,13 @@ export const WeatherWidget = () => {
             {getWeatherIcon(weather.condition)}
             <div>
               <div className="text-2xl font-bold">{weather.temperature}°C</div>
-              <div className="text-sm text-muted-foreground">{weather.description}</div>
+              <div className="text-sm text-muted-foreground capitalize">
+                {weather.description}
+              </div>
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-center gap-2">
             <Droplets className="w-4 h-4 text-blue-500" />
@@ -111,7 +112,7 @@ export const WeatherWidget = () => {
             <span className="text-sm">Angin: {weather.windSpeed} km/h</span>
           </div>
         </div>
-        
+
         <div className="mt-4 text-xs text-muted-foreground">
           Wukirsari, Imogiri, Bantul, Yogyakarta
         </div>
